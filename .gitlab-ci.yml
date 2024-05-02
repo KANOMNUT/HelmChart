@@ -3,7 +3,7 @@ stages:
 
 helm_release:
   stage: release
-  image: alpine/helm:3.14.4
+  image: kanomnutt/helm:latest
   before_script:
   - git fetch origin --prune --unshallow
   - LAST_COMMIT=$(git rev-parse HEAD)
