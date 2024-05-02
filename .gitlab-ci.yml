@@ -1,20 +1,21 @@
-# stages:
-#   - release
+stages:
+  - release
 
-# helm_release:
-#   stage: release
-#   before_script:
-#   - git fetch origin --prune --unshallow
-#   - LAST_COMMIT=$(git rev-parse HEAD^1)
-#   - CHANGED_FILE=$(git diff --name-only $LAST_COMMIT)
-#   - FOLDER_PATH=(dirname $CHANGED_FILE | head -n 1)
-#   - helm repo add --username $CI_REGISTRY_USERNAME --password $CI_REGISTRY_PASSWORD ${HELM_PROJECT} https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/helm/stable
-#   - helm plugin install https://github.com/chartmuseum/helm-push
-#   script:
-#     - cd $FOLDER_PATH
-#     - helm package .
-#     - helm cm-push . ${HELM_PROJECT}
-#   rules:
-#     - if: '$CI_COMMIT_TAG =~ "/^$/"'
-#       changes: 
-#       - charts/**/*
+helm_release:
+  stage: release
+  before_script:
+  - git fetch origin --prune --unshallow
+  - LAST_COMMIT=$(git rev-parse HEAD)
+  - CHANGED_FILE=$(git diff --name-only $LAST_COMMIT | grep charts)
+  - FOLDER_PATH=$(dirname $CHANGED_FILE | head -n 1)
+  - HELM_PROJECT=$($FOLDER_PATH | cut -d '/' -f2)
+  - helm repo add --username $CI_REGISTRY_USERNAME --password $CI_REGISTRY_PASSWORD ${HELM_PROJECT} https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/helm/stable
+  - helm plugin install https://github.com/chartmuseum/helm-push
+  script:
+    - cd $FOLDER_PATH
+    - helm package .
+    - helm cm-push . ${HELM_PROJECT}
+  rules:
+    - if: '$CI_COMMIT_TAG =~ "/^$/"'
+      changes: 
+      - charts/**/*
