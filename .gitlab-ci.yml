@@ -9,6 +9,7 @@ helm_release:
   - CHANGED_FILE=$(git diff --name-only $LAST_COMMIT | grep charts)
   - FOLDER_PATH=$(dirname $CHANGED_FILE | head -n 1)
   - HELM_PROJECT=$(basename $FOLDER_PATH | cut -d '/' -f2)
+  - echo $LAST_COMMIT && echo $CHANGED_FILE && echo $FOLDER_PATH && echo $HELM_PROJECT
   - helm repo add --username $CI_REGISTRY_USERNAME --password $CI_REGISTRY_PASSWORD $HELM_PROJECT $CI_REGISTRY_URL
   - helm plugin install https://github.com/chartmuseum/helm-push
   script:
