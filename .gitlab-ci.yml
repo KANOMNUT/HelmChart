@@ -5,10 +5,14 @@ helm_release:
   stage: release
   image: kanomnutt/helm:latest
   before_script:
-  - LAST_COMMIT=$(git rev-parse HEAD)
+  - LAST_COMMIT=$(git rev-parse HEAD^1)
+  - echo $LAST_COMMIT
   - CHANGED_FILE=$(git diff --name-only $LAST_COMMIT | grep charts)
+  - echo $CHANGED_FILE
   - FOLDER_PATH=$(dirname $CHANGED_FILE | head -n 1)
+  - echo $FOLDER_PATH
   - HELM_PROJECT=$(basename $FOLDER_PATH | cut -d '/' -f2)
+  - echo $HELM_PROJECT
   - helm repo add --username $CI_REGISTRY_USERNAME --password $CI_REGISTRY_PASSWORD ${HELM_PROJECT} https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/helm/stable
   - helm plugin install https://github.com/chartmuseum/helm-push
   script:
