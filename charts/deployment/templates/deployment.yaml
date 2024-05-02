@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.serviceName }}
+  labels:
+    {{- include "deployment.labels" . | nindent 4 }}
+    {{- toYaml .Values.Labels | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "deployment.selectorLabels" . | nindent 6 }}
+      {{- toYaml .Values.Labels | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "deployment.selectorLabels" . | nindent 8 }}
+        {{- toYaml .Values.Labels | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "deployment.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.serviceName }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.serviceName }}
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          {{- if .Values.probes.livenessProbePath }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.livenessProbePath }}
+              port: {{ .Values.probes.livenessProbePort }}
+          {{- end }}
+          {{- if .Values.probes.readinessProbePort }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readinessProbePath }}
+              port: {{ .Values.probes.readinessProbePort }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- with .Values.env }}
+              {{- toYaml . | nindent 10}}
+            {{- end }}
+          envFrom:
+            {{- with .Values.extraEnv }}
+              {{- toYaml . | nindent 10 }}
+            {{- end }}
+          volumeMounts:
+            {{- with .Values.volumeMounts }} 
+              {{- toYaml . | default ""| nindent 12 }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- with .Values.volumes }}
+        {{- toYaml . | default "" | nindent 8 }} 
+      {{- end }}

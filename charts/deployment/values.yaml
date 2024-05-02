@@ -1,0 +1,118 @@
+# Default values for deployment.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+serviceName: ""
+
+Labels: []
+  # app: nginx-test
+
+image:
+  repository: ""
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env: []
+  # - name: POD_NAMESPACE
+  #   valueFrom:
+  #     fieldRef:
+  #       fieldPath: metadata.namespace
+
+
+extraEnv: []
+  # - configMapRef:
+  #     name: nginx-env
+  # - configMapRef:
+  #     name: nginx-env-2
+
+volumes: []
+  # - configMap:
+  #     name: nginx-conf
+  #   name: nginx-conf
+  # - configMap:
+  #     name: nginx-conf-55dhtg26mk
+  #   name: nginx-conf-55dhtg26mk
+
+volumeMounts: []
+  # - mountPath: /test-mount/test1.conf
+  #   name: nginx-conf
+  # - mountPath: /test-mount/test2.conf
+  #   name: nginx-conf-55dhtg26mk
+
+probes:
+  livenessProbePath: ""
+  readinessProbePath: ""
+  livenessProbePort: ""
+  readinessProbePort: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 80
+
+resources: {}
+  # requests:
+  #   cpu: 100m
+  #   memory: 100Mi
+  # limits:
+  #   cpu: 100m
+  #   memory: 100Mi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  # targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: {}
+  # - effect: NoSchedule
+  #   key: StatefulOnly
+  #   operator: Equal
+  #   value: "true"
+
+affinity: {}
+
+PodDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 2
